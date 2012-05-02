@@ -8,7 +8,7 @@
  * Version: 0.2
  * Author:       Ramon Vicente
  * Author URI:   http://ramonvic.com.br/
- * Contributors: Gingarara
+ * Contributors: Ramon Vicente
  * Link: http://wordpress.org/extend/plugins/facebook-comments-notify/
  * Tags: comments, facebook, facebook comments, commenting, notify, notify comments, notification
  * License: GPLv3
