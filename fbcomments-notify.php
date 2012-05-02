@@ -1,12 +1,19 @@
 <?php
 /*
- * Plugin Name: Facebook Comments Notify
- * Plugin URI: http://wordpress.org/extend/plugins/facebook-comments-notify/ 
- * Description: Keep comments on your Facebook wordpress, and receive notifications each comment.
- * Author: Ramon Vicente 
- * Author URI: http://ramonvic.com.br 
- * Version: 0.1
+ * Plugin Name:  Facebook Comments Notify
+ * Requires at least: 3.2.1
+ * Tested up to: 3.2.2
+ * Stable tag: 0.2
+ * Description:  Full Facebook Comments moderation and management for your WordPress site. Quick and easy to set up. Insert automatically or via a shortcode.
+ * Version: 0.2
+ * Author:       Ramon Vicente
+ * Author URI:   http://ramonvic.com.br/
+ * Contributors: Gingarara
+ * Link: http://wordpress.org/extend/plugins/facebook-comments-notify/
+ * Tags: comments, facebook, facebook comments, commenting, notify, notify comments, notification
+ * License: GPLv3
  */
+
 if (! defined('FBCOMMENTS_VERSION')) {
     define('FBCOMMENTS_VERSION', '0.1');
 }
@@ -43,6 +50,7 @@ $fbcomment_default_options = array(
     'email_username' => '',
     'email_password' => '',
     'email_to_send' => '', 
+    'email_text_to_send' => '<p>Novo Comentário na página <a href="#HREF#">#HREF#</a></p>', 
     'scheme' => 'light',
     'width' => '450',
 );
@@ -69,6 +77,10 @@ class FBNotify {
         
         add_action('wp_ajax_nopriv_send_comment_notification', array('FBNotify', 'send_notification'));
         add_action('wp_ajax_send_comment_notification', array('FBNotify', 'send_notification'));
+        
+        
+        add_filter('widget_text', array('FBNotify', 'do_shortcode'), 100);
+        add_shortcode('fbcomments', array('FBNotify', 'add_shortcode'), 100);
 
     }
     
@@ -76,7 +88,7 @@ class FBNotify {
      * Adiciona Caminho no Menu para as Configuracoes do Plugin
      * @return void
      */
-    public function admin_menu(){
+    public function admin_menu(){ 
         add_options_page(
             __('Facebook Comments Notify'), 
             __('Facebook Comments'), 
@@ -137,22 +149,12 @@ class FBNotify {
     public function add_script_notification(){
         global $fbcomment_options;
         $postID = self::getInstance()->_postID;
+        
         echo "<script type=\"text/javascript\">
-                FB.Event.subscribe('comment.create', function(a) {
-                    //jQuery.post('" . admin_url() . "/admin-ajax.php', {action : 'save_comment', postID : {$postID}}, function(){
-    
-                    //});";
-        
-        if($fbcomment_options['notification_active'] && $fbcomment_options['email_to_send']){
-            echo "
-                if(console)
-                jQuery.post('" . admin_url() . "/admin-ajax.php', {action : 'send_comment_notification', postID : {$postID}, href : a.href}, function(a){
-                     //Comentario enviado
-                });";
-        }
-        
+                FB.Event.subscribe('comment.create', function(a) {";        
+        if($fbcomment_options['notification_active'] && $fbcomment_options['email_to_send'])
+            echo " jQuery.post('" . admin_url() . "admin-ajax.php', {action : 'send_comment_notification', postID : '{$postID}', href : a.href}, function(a){});";
         echo "});</script>";
-       
     }
     
     
@@ -184,12 +186,20 @@ class FBNotify {
     
     public function send_notification(){
         global $fbcomment_options, $phpmailer;
+        ignore_user_abort(true);
         self::setup_mailer();
         $p = $_POST;
         if ($p){
+            
+            foreach($p as $key=>$value){
+                $patterns[] = "/#".strtoupper($key)."#/";
+                $replacements[]  = (string)$value;
+            }
+            
+            $message =  preg_replace($patterns, $replacements, $fbcomment_options['email_text_to_send']);
+            
             $phpmailer->AddAddress($fbcomment_options['email_to_send']);
             $phpmailer->Subject = __('New comment on site : ') . get_bloginfo('site_name');
-            $message = "<p>Novo Comentário na página <a href=\"{$p['href']}\">{$p['href']}</a></p>";
             $phpmailer->MsgHTML($message);
             $phpmailer->Send();
             exit();
@@ -217,6 +227,40 @@ class FBNotify {
         }
         $phpmailer->SetFrom(get_bloginfo('admin_email'), get_bloginfo('admin_name'));
         $phpmailer->CharSet = 'utf-8';
+    }
+    
+    public function add_shortcode($fbatts){
+        global $fbcomment_options;
+        
+        extract(shortcode_atts(array(
+    		"width" => $fbcomment_options['width'],
+    		"show_count" => $fbcomment_options['show_count'],
+    		"count_text" => $fbcomment_options['count_text'],
+    		"number" => $fbcomment_options['number'],
+    		"title" => $fbcomment_options['title'],
+    		"migrated" => $fbcomment_options['migrated'],
+    		"url" => get_permalink(),
+    		"linklove" => $fbcomment_options['linklove'],
+    		"scheme" => $fbcomment_options['scheme'],
+        ), $fbatts));
+        
+        if ($migrated)
+            $migrate = "migrated=\"1\"";
+        
+        if ($show_count && $count_text)
+            $commentcount = "<p><fb:comments-count href='{$url}'></fb:comments-count>{$count_text}</p>";
+        
+        $content .= "<div class=\"fbcomments_notify\">";
+        $content .= $title ? "<h3>{$title}</h3>" : "";
+        
+        if ($fbcomment_options['use_html5'])
+            $content .= $commentcount . "<div class=\"fbcommentbox\"><div class=\"fb-comments\" notify=\"true\" data-href=\"{$url}\" data-num-posts=\"{$number}\" data-width=\"{$width}\" data-colorscheme=\"{$scheme}\"></div></div>";
+        else
+            $content .= $commentcount . "<div class=\"fbcommentbox\"><fb:comments notify=\"true\" href=\"{$url}\" num_posts=\"{$number}\" width=\"{$width}\" colorscheme=\"{$scheme}\"></fb:comments></div>";
+        
+        $content .= "</div>";
+        
+        return $content;
     }
     
     static function getInstance(){
