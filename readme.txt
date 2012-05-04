@@ -24,6 +24,8 @@ This section describes how to install the plugin and get it working.
 == Description ==
 Full Facebook Comments moderation and management for your WordPress site. Quick and easy to set up. Insert automatically or via a shortcode.
 
+* For Suggestions & Support, send email to [ramonvicentesilva@hotmail.com], containing the subject "Facebook Notify Comments"
+
 == Changelog ==
 = 0.2 =
 * Added field to edit the text of the notification email
