@@ -95,7 +95,7 @@ function use_gmail(){
 		jQuery('#fbcomments\\[email_host\\]').val('smtp.gmail.com');
 		jQuery('#fbcomments\\[email_port\\]').val('465');
 		jQuery('#fbcomments\\[email_auth\\]').attr('checked', 1);
-		jQuery('#fbcomments\\[email_secure_type\\]').val('ssl');
+		jQuery('#fbcomments\\[email_secure_type\\]').val('tls');
 		if (!jQuery('#fbcomments\\[email_username\\]').val().match(/.+@gmail.com$/) ) {
 			jQuery('#fbcomments\\[email_username\\]').val('USERNAME@gmail.com').focus().get(0).setSelectionRange(0,8);
 		}
@@ -204,7 +204,7 @@ jQuery(function(){
                             <tr>
                                 <th scope="row"><label for="fbcomments[email_text_to_send]"><?php _e('Text Email Notification') ?></label></th>
                                 <td><textarea rows="5" cols="100" name="fbcomments[email_text_to_send]" id="fbcomments[email_text_to_send]" class="regular-text"><?php echo $fbcomment_options['email_text_to_send']; ?></textarea><br />
-                                    <?php _e('E-mail body text # (hash) delimit variables, the variables currently available are  #NOME#, #EMAIL#, #HREF#, #TITLE#')?>
+                                    <?php _e('E-mail body text # (hash) delimit variables, the variables currently available are  #NAME#, #HREF#, #TITLE#, #COMMENT#')?>
                                 </td>
                             </tr>
                         </table>

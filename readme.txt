@@ -2,9 +2,9 @@
 Plugin Name:  Facebook Comments Notify
 Requires at least: 3.2.1
 Tested up to: 3.2.2
-Stable tag: 0.2
+Stable tag: 0.3
 Description:  Full Facebook Comments moderation and management for your WordPress site. Quick and easy to set up. Insert automatically or via a shortcode.
-Version: 0.2
+Version: 0.3
 Author:       Ramon Vicente
 Author URI:   http://ramonvic.com.br/
 Contributors: Ramon Vicente
@@ -27,6 +27,11 @@ Full Facebook Comments moderation and management for your WordPress site. Quick 
 * For Suggestions & Support, send email to [ramonvicentesilva@hotmail.com], containing the subject "Facebook Notify Comments"
 
 == Changelog ==
+= 0.3 =
+* Added Plugin Action Link, to configurations;
+* Fixed 'Text Email Notification' variables;
+* Some bug fixes
+
 = 0.2 =
 * Added field to edit the text of the notification email
 * Added the option to use short_code ('[fbcomments]');

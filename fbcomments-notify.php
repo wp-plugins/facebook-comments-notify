@@ -3,9 +3,9 @@
  * Plugin Name:  Facebook Comments Notify
  * Requires at least: 3.2.1
  * Tested up to: 3.2.2
- * Stable tag: 0.2
+ * Stable tag: 0.3
  * Description:  Full Facebook Comments moderation and management for your WordPress site. Quick and easy to set up. Insert automatically or via a shortcode.
- * Version: 0.2
+ * Version: 0.3
  * Author:       Ramon Vicente
  * Author URI:   http://ramonvic.com.br/
  * Contributors: Ramon Vicente
@@ -68,7 +68,9 @@ class FBNotify {
         add_option('fbComments', $fbcomment_default_options);
         $fbcomment_options = get_option('fbComments');
         add_action('admin_menu', array('FBNotify', 'admin_menu')); //Adiciona Link para as Configuraçoes
-        add_action('wp_head', array('FBNotify', 'add_meta_app_id')); //Add app_ID meta_tag on wp_head
+		add_filter( 'plugin_action_links', array('FBNotify', 'plugin_action_links'), 10, 2 );
+        
+		add_action('wp_head', array('FBNotify', 'add_meta_app_id')); //Add app_ID meta_tag on wp_head
         add_filter('language_attributes', array('FBNotify', 'add_name_space')); //Adiciona os namespaces a tag html
         
         add_action('wp_footer', array('FBNotify', 'addscript'), 100);
@@ -96,7 +98,18 @@ class FBNotify {
             'fbcomments_notify', 
             array('FBNotify', 'options_page')
         );
+		
+		
     }
+	
+	public function plugin_action_links( $links, $file ) {
+		if ( $file == plugin_basename(__FILE__) ) {
+			$links[] = '<a href="' . admin_url( 'options-general.php?page=fbcomments_notify' ) . '">'.__('Settings').'</a>';
+		}
+	
+		return $links;
+	}
+
     
     /**
      * Carrega a Pagina de Configuracao do Plugin
@@ -151,9 +164,12 @@ class FBNotify {
         $postID = self::getInstance()->_postID;
         
         echo "<script type=\"text/javascript\">
-                FB.Event.subscribe('comment.create', function(a) {";        
+                FB.Event.subscribe('comment.create', function(a) {\n";        
         if($fbcomment_options['notification_active'] && $fbcomment_options['email_to_send'])
-            echo " jQuery.post('" . admin_url() . "admin-ajax.php', {action : 'send_comment_notification', postID : '{$postID}', href : a.href}, function(a){});";
+			echo "FB.api('comments', {'ids': a.href}, function(res) {\n";
+    		echo "var data = res[a.href].comments.data.pop();\n";
+            echo " jQuery.post('" . admin_url() . "admin-ajax.php', {action : 'send_comment_notification', postID : '{$postID}', href : a.href, data : data, title : jQuery('title').html()}, function(a){});\n";
+			echo "});";
         echo "});</script>";
     }
     
@@ -187,17 +203,25 @@ class FBNotify {
     public function send_notification(){
         global $fbcomment_options, $phpmailer;
         ignore_user_abort(true);
+		set_time_limit(0);
         self::setup_mailer();
         $p = $_POST;
         if ($p){
-            
-            foreach($p as $key=>$value){
+            $data = array(
+				'comment_id' => $p['data']['id'],
+				'name' => $p['data']['from']['name'],
+				'id_facebook' => $p['data']['from']['id'],
+				'href' => $p['href'],
+				'title' => $p['title'],
+				'comment' => $p['data']['message']
+			);
+            foreach($data as $key=>$value){
                 $patterns[] = "/#".strtoupper($key)."#/";
                 $replacements[]  = (string)$value;
             }
             
             $message =  preg_replace($patterns, $replacements, $fbcomment_options['email_text_to_send']);
-            
+            exit($message);
             $phpmailer->AddAddress($fbcomment_options['email_to_send']);
             $phpmailer->Subject = __('New comment on site : ') . get_bloginfo('site_name');
             $phpmailer->MsgHTML($message);
