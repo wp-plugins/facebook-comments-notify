@@ -95,7 +95,7 @@ function use_gmail(){
 		jQuery('#fbcomments\\[email_host\\]').val('smtp.gmail.com');
 		jQuery('#fbcomments\\[email_port\\]').val('465');
 		jQuery('#fbcomments\\[email_auth\\]').attr('checked', 1);
-		jQuery('#fbcomments\\[email_secure_type\\]').val('tls');
+		jQuery('#fbcomments\\[email_secure_type\\]').val('ssl');
 		if (!jQuery('#fbcomments\\[email_username\\]').val().match(/.+@gmail.com$/) ) {
 			jQuery('#fbcomments\\[email_username\\]').val('USERNAME@gmail.com').focus().get(0).setSelectionRange(0,8);
 		}

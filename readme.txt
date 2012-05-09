@@ -2,12 +2,12 @@
 Plugin Name:  Facebook Comments Notify
 Requires at least: 3.2.1
 Tested up to: 3.2.2
-Stable tag: 0.3
+Stable tag: 0.3.1
 Description:  Full Facebook Comments moderation and management for your WordPress site. Quick and easy to set up. Insert automatically or via a shortcode.
-Version: 0.3
+Version: 0.3.1
 Author:       Ramon Vicente
 Author URI:   http://ramonvic.com.br/
-Contributors: Ramon Vicente
+Contributors: Umobi Platform Free
 Link: http://wordpress.org/extend/plugins/facebook-comments-notify/
 Tags: comments, facebook, facebook comments, commenting, notify, notify comments, notification
 License: GPLv3
@@ -24,9 +24,16 @@ This section describes how to install the plugin and get it working.
 == Description ==
 Full Facebook Comments moderation and management for your WordPress site. Quick and easy to set up. Insert automatically or via a shortcode.
 
-* For Suggestions & Support, send email to [ramonvicentesilva@hotmail.com], containing the subject "Facebook Notify Comments"
+* For Suggestions & Support, send email to [ramonvicentesilva@hotmail.com](mailto:ramonvicentesilva@hotmail.com "Email Contact"), containing the subject "Facebook Notify Comments"
+* Thanks to [Umobi](http://umobi.com.br), the company that provided all support and structure for developing this plugin.
 
 == Changelog ==
+= 0.3.1 =
+* Fixed Error on Send Notification
+* Fixed Secure connection prefix of GMAIL
+* Fixed Sintax error on Javascript Code
+* Some bug fixes
+
 = 0.3 =
 * Added Plugin Action Link, to configurations;
 * Fixed 'Text Email Notification' variables;

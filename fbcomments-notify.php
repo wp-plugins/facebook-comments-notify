@@ -1,17 +1,17 @@
 <?php
 /*
- * Plugin Name:  Facebook Comments Notify
- * Requires at least: 3.2.1
- * Tested up to: 3.2.2
- * Stable tag: 0.3
- * Description:  Full Facebook Comments moderation and management for your WordPress site. Quick and easy to set up. Insert automatically or via a shortcode.
- * Version: 0.3
- * Author:       Ramon Vicente
- * Author URI:   http://ramonvic.com.br/
- * Contributors: Ramon Vicente
- * Link: http://wordpress.org/extend/plugins/facebook-comments-notify/
- * Tags: comments, facebook, facebook comments, commenting, notify, notify comments, notification
- * License: GPLv3
+ * Plugin Name:      Facebook Comments Notify
+ * Requires at least:3.2.1
+ * Tested up to:     3.2.2
+ * Stable tag:       0.3.1
+ * Description:      Full Facebook Comments moderation and management for your WordPress site. Quick and easy to set up. Insert automatically or via a shortcode.
+ * Version:          0.3.1
+ * Author:           Ramon Vicente
+ * Author URI:       http://ramonvic.com.br/
+ * Contributors:     Umobi Platform Free
+ * Link:             http://wordpress.org/extend/plugins/facebook-comments-notify/
+ * Tags:             comments, facebook, facebook comments, commenting, notify, notify comments, notification
+ * License:          GPLv3
  */
 
 if (! defined('FBCOMMENTS_VERSION')) {
@@ -163,14 +163,15 @@ class FBNotify {
         global $fbcomment_options;
         $postID = self::getInstance()->_postID;
         
+        if($fbcomment_options['notification_active'] && $fbcomment_options['email_to_send']){
         echo "<script type=\"text/javascript\">
                 FB.Event.subscribe('comment.create', function(a) {\n";        
-        if($fbcomment_options['notification_active'] && $fbcomment_options['email_to_send'])
 			echo "FB.api('comments', {'ids': a.href}, function(res) {\n";
     		echo "var data = res[a.href].comments.data.pop();\n";
             echo " jQuery.post('" . admin_url() . "admin-ajax.php', {action : 'send_comment_notification', postID : '{$postID}', href : a.href, data : data, title : jQuery('title').html()}, function(a){});\n";
 			echo "});";
         echo "});</script>";
+        }
     }
     
     
@@ -221,12 +222,16 @@ class FBNotify {
             }
             
             $message =  preg_replace($patterns, $replacements, $fbcomment_options['email_text_to_send']);
-            exit($message);
+            
             $phpmailer->AddAddress($fbcomment_options['email_to_send']);
             $phpmailer->Subject = __('New comment on site : ') . get_bloginfo('site_name');
             $phpmailer->MsgHTML($message);
-            $phpmailer->Send();
-            exit();
+            if($phpmailer->Send()){
+                $error = '{"error":"OK"}';
+            }else{
+                $error = '{"error":"' . $phpmailer->ErrorInfo . '"}';
+            }
+            exit($error);
         }
     }
     
