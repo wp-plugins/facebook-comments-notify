@@ -1,11 +1,11 @@
 <?php
 /*
  * Plugin Name:      Facebook Comments Notify
- * Requires at least:3.2.1
- * Tested up to:     3.2.2
- * Stable tag:       0.3.1
+ * Requires at least:3.3
+ * Tested up to:     3.3.2
+ * Stable tag:       0.4
  * Description:      Full Facebook Comments moderation and management for your WordPress site. Quick and easy to set up. Insert automatically or via a shortcode.
- * Version:          0.3.1
+ * Version:          0.4
  * Author:           Ramon Vicente
  * Author URI:       http://ramonvic.com.br/
  * Contributors:     Umobi Platform Free
@@ -15,7 +15,7 @@
  */
 
 if (! defined('FBCOMMENTS_VERSION')) {
-    define('FBCOMMENTS_VERSION', '0.1');
+    define('FBCOMMENTS_VERSION', '0.4');
 }
 define('FBCOMMENTS_ABSPATH', dirname(__FILE__));
 define('FBCOMMENTS_RELPATH', plugins_url() . '/' . basename(FBCOMMENTS_ABSPATH));
@@ -83,7 +83,26 @@ class FBNotify {
         
         add_filter('widget_text', array('FBNotify', 'do_shortcode'), 100);
         add_shortcode('fbcomments', array('FBNotify', 'add_shortcode'), 100);
+        
+        if (!$fbcomment_options['app_id']) add_action('admin_notices', array('FBNotify', 'show_alert_install'));
+        add_action("admin_head", array('FBNotify', 'add_tiny_mce'));
 
+    }
+    
+    public static function add_tiny_mce(){
+    }
+    
+    public static function show_alert_install(){
+        self::showMessage(__('Make it the required configurations (App_ID) for the plugin "Facebook Comments Notify" to work.'), true);
+    }
+    
+    public static function showMessage($message, $errormsg = false){
+        if ($errormsg) 
+    		echo '<div id="message" class="error">';
+    	else 
+    		echo '<div id="message" class="updated fade">';
+
+	    echo "<p><strong>$message</strong></p></div>";
     }
     
     /**
@@ -208,6 +227,22 @@ class FBNotify {
         self::setup_mailer();
         $p = $_POST;
         if ($p){
+            
+            wp_insert_comment(
+              array(
+                    'comment_post_ID' => $p['postID'],
+                    'comment_author' => $p['data']['from']['id'],
+                    'comment_author_email' => '',
+                    'comment_author_url' => '',
+                    'comment_content' => $p['data']['message'],
+                    'comment_author_IP' => $_SERVER['REMOTE_ADDR'],
+                    'comment_agent' => $_SERVER['HTTP_USER_AGENT'],
+                    'comment_date' => date('Y-m-d H:i:s', strtotime($p['data']['created_time'])),
+                    'comment_date_gmt' => date('Y-m-d H:i:s', strtotime($p['data']['created_time'])),
+                    'comment_approved' => 1,
+                )
+            );
+            
             $data = array(
 				'comment_id' => $p['data']['id'],
 				'name' => $p['data']['from']['name'],
