@@ -203,8 +203,11 @@ jQuery(function(){
                         <table class="form-table">
                             <tr>
                                 <th scope="row"><label for="fbcomments[email_text_to_send]"><?php _e('Text Email Notification') ?></label></th>
-                                <td><textarea rows="5" cols="100" name="fbcomments[email_text_to_send]" id="fbcomments[email_text_to_send]" class="regular-text"><?php echo $fbcomment_options['email_text_to_send']; ?></textarea><br />
+                                <td>
+                                    <?php wp_editor($fbcomment_options['email_text_to_send'], "fbcomments[email_text_to_send]", array('media_buttons' => false, 'textarea_rows' => 10, 'teeny' => true, 'wpautop' => false));?>
+                                <br />
                                     <?php _e('E-mail body text # (hash) delimit variables, the variables currently available are  #NAME#, #HREF#, #TITLE#, #COMMENT#')?>
+                                    
                                 </td>
                             </tr>
                         </table>
