@@ -5,9 +5,8 @@ Tested up to: 3.3.2
 Stable tag: 0.4
 Description:  Full Facebook Comments moderation and management for your WordPress site. Quick and easy to set up. Insert automatically or via a shortcode.
 Version: 0.4
-Author:       Ramon Vicente
 Author URI:   http://ramonvic.com.br/
-Contributors: Umobi Platform Free
+Contributors: ramonvic
 Link: http://wordpress.org/extend/plugins/facebook-comments-notify/
 Tags: comments, facebook, facebook comments, commenting, notify, notify comments, notification
 License: GPLv3
